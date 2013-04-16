@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<CheckBoxPreference
+		android:key="DisplayBigCards"
+		android:title="@string/big_cards"
+		android:summary="Use large card images"
+		android:summaryOn="Large card images"
+		android:summaryOff="Small card images"
+		android:defaultValue="false" />
+
+	<CheckBoxPreference
+		android:key="DisplayTime"
+		android:title="@string/display_time"
+		android:summary="Show time during game"
+		android:summaryOn="Show timer during game"
+		android:summaryOff="Don't show timer during game"
+		android:defaultValue="true" />
+
+	<ListPreference
+		android:key="auto_move"
+		android:title="Automatically move cards"
+		android:dialogTitle="When to automatically move cards"
+		android:entries="@array/auto_move_entries"
+		android:entryValues="@array/auto_move_values"
+		android:defaultValue="3" />
+
+	<PreferenceCategory
+		android:title="Klondike solitaire"
+		android:key="settings_klondike">
+
+		<ListPreference
+			android:key="klondike_deal_mode"
+			android:title="Dealing mode"
+			android:dialogTitle="Dealing"
+			android:entries="@array/klondike_deal_entries"
+			android:entryValues="@array/klondike_deal_values"
+			android:summary="Deal one or three cards at a time"
+			android:defaultValue="3" />
+
+		<ListPreference
+			android:key="klondike_scoring"
+			android:title="Scoring mode"
+			android:dialogTitle="Scoring"
+			android:entries="@array/klondike_scoring_entries"
+			android:entryValues="@array/klondike_scoring_values"
+			android:summary="Normal or vegas scoring"
+			android:defaultValue="normal" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="Spider solitaire"
+		android:key="settings_solitaire">
+
+		<ListPreference
+			android:key="spider_num_suits"
+			android:title="Number of suits"
+			android:dialogTitle="Dealing"
+			android:entries="@array/spider_num_suits_entries"
+			android:entryValues="@array/spider_num_suits_values"
+			android:summary="1, 2 or 4 suits"
+			android:defaultValue="2" />
+
+	</PreferenceCategory>
+
+
+</PreferenceScreen>
