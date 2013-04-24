@@ -323,20 +323,20 @@ class NormalSolitaire extends Rules {
 
 	@Override
 	public void Resize( int width, int height ) {
-		int rem = width - Card.WIDTH * 7;
-		int maxHeight = height - (20 + Card.HEIGHT);
+		int rem = width - Card.getWidth() * 7;
+		int maxHeight = height - (20 + Card.getHeight());
 		rem /= 8;
 		for ( int i = 0; i < 7; i++ ) {
-			mCardAnchor[i + 6].SetPosition( rem + i * (rem + Card.WIDTH), 20 + Card.HEIGHT );
+			mCardAnchor[i + 6].SetPosition( rem + i * (rem + Card.getWidth()), 20 + Card.getHeight() );
 			mCardAnchor[i + 6].SetMaxHeight( maxHeight );
 		}
 
 		for ( int i = 3; i >= 0; i-- ) {
-			mCardAnchor[i + 2].SetPosition( rem + (6 - i) * (rem + Card.WIDTH), 10 );
+			mCardAnchor[i + 2].SetPosition( rem + (6 - i) * (rem + Card.getWidth()), 10 );
 		}
 
 		for ( int i = 0; i < 2; i++ ) {
-			mCardAnchor[i].SetPosition( rem + i * (rem + Card.WIDTH), 10 );
+			mCardAnchor[i].SetPosition( rem + i * (rem + Card.getWidth()), 10 );
 		}
 
 		// Setup edge cards (Touch sensor loses sensitivity towards the edge).
@@ -633,9 +633,9 @@ class Spider extends Rules {
 	}
 
 	public void Resize( int width, int height ) {
-		int rem = (width - (Card.WIDTH * 10)) / 10;
+		int rem = (width - (Card.getWidth() * 10)) / 10;
 		for ( int i = 0; i < 10; i++ ) {
-			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.WIDTH), 10 );
+			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 10 );
 			mCardAnchor[i].SetMaxHeight( height - 10 );
 		}
 		// Setup edge cards (Touch sensor loses sensitivity towards the edge).
@@ -807,11 +807,11 @@ class Freecell extends Rules {
 	}
 
 	public void Resize( int width, int height ) {
-		int rem = (width - (Card.WIDTH * 8)) / 8;
+		int rem = (width - (Card.getWidth() * 8)) / 8;
 		for ( int i = 0; i < 8; i++ ) {
-			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.WIDTH), 10 );
-			mCardAnchor[i + 8].SetPosition( rem / 2 + i * (rem + Card.WIDTH), 30 + Card.HEIGHT );
-			mCardAnchor[i + 8].SetMaxHeight( height - 30 - Card.HEIGHT );
+			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 10 );
+			mCardAnchor[i + 8].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 30 + Card.getHeight() );
+			mCardAnchor[i + 8].SetMaxHeight( height - 30 - Card.getHeight() );
 		}
 
 		// Setup edge cards (Touch sensor loses sensitivity towards the edge).
@@ -1014,12 +1014,12 @@ class FortyThieves extends Rules {
 	}
 
 	public void Resize( int width, int height ) {
-		int rem = (width - (Card.WIDTH * 10)) / 10;
+		int rem = (width - (Card.getWidth() * 10)) / 10;
 		for ( int i = 0; i < 10; i++ ) {
-			mCardAnchor[i].SetMaxHeight( height - 30 - Card.HEIGHT );
-			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.WIDTH), 30 + Card.HEIGHT );
+			mCardAnchor[i].SetMaxHeight( height - 30 - Card.getHeight() );
+			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 30 + Card.getHeight() );
 
-			mCardAnchor[i + 10].SetPosition( rem / 2 + i * (rem + Card.WIDTH), 10 );
+			mCardAnchor[i + 10].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 10 );
 		}
 
 		// Setup edge cards (Touch sensor loses sensitivity towards the edge).

@@ -16,9 +16,7 @@
 package com.kmagic.solitaire;
 
 import android.content.*;
-import android.content.res.*;
 import android.graphics.*;
-import android.graphics.drawable.*;
 import com.kmagic.solitaire.render.*;
 
 
@@ -111,7 +109,7 @@ public class DrawMaster {
 	}
 
 	public void DrawEmptyAnchor( Canvas canvas, float x, float y, boolean done ) {
-		RectF pos = new RectF( x, y, x + Card.WIDTH, y + Card.HEIGHT );
+		RectF pos = new RectF( x, y, x + Card.getWidth(), y + Card.getHeight() );
 		if ( !done ) {
 			canvas.drawRoundRect( pos, 4, 4, mEmptyAnchorPaint );
 		} else {

@@ -7,8 +7,8 @@ import com.kmagic.solitaire.*;
 
 public class NormalCardRenderer extends CardRenderer {
 
-	final int FACE_WIDTH  = Card.WIDTH - 20;
-	final int FACE_HEIGHT = Card.HEIGHT / 2 - 9;
+	final int FACE_WIDTH  = Card.getWidth() - 20;
+	final int FACE_HEIGHT = Card.getHeight() / 2 - 9;
 
 	final int FONT_WIDTH = 7;
 	final int FONT_HEIGHT = 9;
@@ -98,8 +98,8 @@ public class NormalCardRenderer extends CardRenderer {
 		prepareFaces();
 		prepareFonts();
 
-		int width = Card.WIDTH;
-		int height = Card.HEIGHT;
+		int width = Card.getWidth();
+		int height = Card.getHeight();
 		float[] faceBox = { 9, 8, width - 10, 8, width - 10, 8, width - 10, height - 9, width - 10, height - 9, 9, height - 9, 9, height - 8, 9, 8 };
 
 		Paint cardFrontPaint = new Paint();

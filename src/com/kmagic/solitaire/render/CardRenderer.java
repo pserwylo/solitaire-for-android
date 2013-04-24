@@ -34,8 +34,8 @@ abstract public class CardRenderer {
 	abstract protected void renderCards();
 
 	protected void renderHiddenCard() {
-		hiddenCard = Bitmap.createBitmap( Card.WIDTH, Card.HEIGHT, Bitmap.Config.ARGB_4444 );
-		Drawable hiddenCardDrawable = resources.getDrawable( R.drawable.cardback );
+		hiddenCard = Bitmap.createBitmap( Card.getWidth(), Card.getHeight(), Bitmap.Config.ARGB_4444 );
+		Drawable hiddenCardDrawable = resources.getDrawable( R.drawable.detailed_card_back );
 		Canvas canvas = new Canvas( hiddenCard );
 		hiddenCardDrawable.setBounds( 0, 0, hiddenCard.getWidth(), hiddenCard.getHeight() );
 		hiddenCardDrawable.draw( canvas );

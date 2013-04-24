@@ -21,8 +21,8 @@ public class LargeSuitCardRenderer extends CardRenderer {
 		Bitmap[] blackFont;
 		Bitmap[] redFont;
 		Canvas canvas;
-		int width = Card.WIDTH;
-		int height = Card.HEIGHT;
+		int width = Card.getWidth();
+		int height = Card.getHeight();
 
 		Drawable drawable = resources.getDrawable( R.drawable.cardback );
 

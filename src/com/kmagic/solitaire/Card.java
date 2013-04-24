@@ -15,6 +15,10 @@
 */
 package com.kmagic.solitaire;
 
+import android.app.*;
+import android.graphics.*;
+import android.view.*;
+
 public class Card {
 
 	public static final int CLUBS = 0;
@@ -28,25 +32,39 @@ public class Card {
 	public static final int KING = 13;
 	public static final String TEXT[] = { "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K" };
 
-	public static int WIDTH = 45;
-	public static int HEIGHT = 64;
+	private static int width = 45;
+	private static int height = 64;
 
 	private int mValue;
 	private int mSuit;
 	private float mX;
 	private float mY;
 
-	public static void SetSize( int type ) {
-		if ( type == Rules.SOLITAIRE ) {
-			WIDTH = 51;
-			HEIGHT = 72;
-		} else if ( type == Rules.FREECELL ) {
-			WIDTH = 49;
-			HEIGHT = 68;
-		} else {
-			WIDTH = 45;
-			HEIGHT = 64;
+	public static void SetSize( int type, Point screenSize ) {
+		int cardsAcross;
+		switch ( type ) {
+			case Rules.SOLITAIRE:
+				cardsAcross = 7;
+				break;
+
+			case Rules.FREECELL:
+				cardsAcross = 8;
+				break;
+
+			case Rules.SPIDER:
+			case Rules.FORTYTHIEVES:
+				cardsAcross = 10;
+				break;
+
+			default:
+				cardsAcross = 8;
+				break;
 		}
+
+		float estimatedWidth = screenSize.x / ( cardsAcross + 2 ); // Add two to make extra padding between.
+		float ratio = 1.37f;
+		width = (int)estimatedWidth;
+		height = (int)( estimatedWidth * ratio );
 	}
 
 	public Card( int value, int suit ) {
@@ -54,6 +72,14 @@ public class Card {
 		mSuit = suit;
 		mX = 1;
 		mY = 1;
+	}
+
+	public static int getWidth() {
+		return width;
+	}
+
+	public static int getHeight() {
+		return height;
 	}
 
 	public float GetX() {
