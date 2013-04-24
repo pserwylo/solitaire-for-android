@@ -15,7 +15,7 @@
 */
 package com.kmagic.solitaire;
 
-class Card {
+public class Card {
 
 	public static final int CLUBS = 0;
 	public static final int DIAMONDS = 1;
