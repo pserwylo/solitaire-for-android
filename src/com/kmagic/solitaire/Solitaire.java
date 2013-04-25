@@ -16,17 +16,16 @@
 package com.kmagic.solitaire;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.TextView;
-import com.kmagic.solitaire.activities.Preferences;
 
 // Base activity class.
 public class Solitaire extends Activity {
@@ -140,7 +139,7 @@ public class Solitaire extends Activity {
         DisplayStats();
         break;
       case MENU_OPTIONS:
-        displayOptions();
+        DisplayOptions();
         break;
       case MENU_HELP:
         mSolitaireView.DisplayHelp();
@@ -184,7 +183,8 @@ public class Solitaire extends Activity {
     super.onSaveInstanceState(outState);
   }
 
-	public void displayOptions() {
+	public void DisplayOptions() {
+		mSolitaireView.SetTimePassing(false);
 		Intent intent = new Intent( this, Preferences.class );
 		startActivity( intent );
 	}
