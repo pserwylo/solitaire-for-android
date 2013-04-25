@@ -17,6 +17,7 @@ package com.kmagic.solitaire;
 
 import android.content.*;
 import android.graphics.*;
+import android.view.*;
 import com.kmagic.solitaire.render.*;
 
 
@@ -50,9 +51,10 @@ public class DrawMaster {
 	public DrawMaster( Context context ) {
 
 		mContext = context;
-		// Default to this for simplicity
-		mScreenWidth = 480;
-		mScreenHeight = 295;
+
+		WindowManager wm = (WindowManager)context.getSystemService( Context.WINDOW_SERVICE );
+		mScreenWidth  = wm.getDefaultDisplay().getWidth();
+		mScreenHeight = wm.getDefaultDisplay().getHeight();
 
 		// Background
 		mBGPaint = new Paint();
