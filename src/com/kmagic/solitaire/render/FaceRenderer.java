@@ -14,23 +14,25 @@ public class FaceRenderer {
 	}
 
 	public Bitmap render( Drawable drawable ) {
-		return render( drawable, false );
-	}
+		Bitmap face = Bitmap.createBitmap( width, height * 2, Bitmap.Config.ARGB_4444 );
 
-	public Bitmap renderReversed( Drawable drawable ) {
-		return render( drawable, true );
-	}
-
-	protected Bitmap render( Drawable drawable, boolean reversed ) {
-		Bitmap face = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_4444 );
 		Canvas canvas = new Canvas( face );
-		if ( reversed ) {
-			canvas.rotate( 180 );
-			drawable.setBounds( -width, -height, 0, 0 );
-		} else {
-			drawable.setBounds( 0, 0, width, height );
-		}
+		drawable.setBounds( 0, 0, width, height );
 		drawable.draw( canvas );
+
+		canvas.rotate( 180, width / 2, height / 2 );
+		drawable.setBounds( 0, -height, width, 0 );
+		drawable.draw( canvas );
+		canvas.rotate( 180, width / 2, height / 2 );
+
+		Paint paint = new Paint();
+		paint.setARGB( 255, 0, 0, 0 );
+		paint.setStrokeWidth( 1 );
+		paint.setStyle( Paint.Style.STROKE );
+
+		Rect border = canvas.getClipBounds();
+		canvas.drawRect( 0, 0, border.width() - 1, border.height() - 1, paint );
+
 		return face;
 	}
 

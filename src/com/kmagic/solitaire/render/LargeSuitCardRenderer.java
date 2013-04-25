@@ -24,11 +24,9 @@ public class LargeSuitCardRenderer extends CardRenderer {
 		int width = Card.getWidth();
 		int height = Card.getHeight();
 
-		Drawable drawable = resources.getDrawable( R.drawable.cardback );
-
 		SuitRenderer suitRenderer = new SuitRenderer();
-		Drawable bigSuitDrawable = resources.getDrawable( R.drawable.bigsuits );
-		Drawable suitDrawable    = resources.getDrawable( R.drawable.suits );
+		Drawable bigSuitDrawable = resources.getDrawable( R.drawable.suits_25x25 );
+		Drawable suitDrawable    = resources.getDrawable( R.drawable.suits_25x25 );
 		bigSuit = suitRenderer.render( bigSuitDrawable, 25, 25 );
 		suit    = suitRenderer.render( suitDrawable, 10, 10 );
 

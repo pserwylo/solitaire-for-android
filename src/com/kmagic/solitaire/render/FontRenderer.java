@@ -22,7 +22,8 @@ public class FontRenderer {
 	}
 
 	protected Bitmap[] render( Drawable drawable, boolean reverse ) {
-		Bitmap[] characters = new Bitmap[13];
+		drawable.setFilterBitmap( true );
+		Bitmap[] characters = new Bitmap[ 13 ];
 		for ( int i = 0; i < 13; i++ ) {
 			characters[ i ] = Bitmap.createBitmap( FONT_WIDTH, FONT_HEIGHT, Bitmap.Config.ARGB_4444 );
 			Canvas canvas = new Canvas( characters[ i ] );

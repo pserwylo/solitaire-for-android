@@ -14,14 +14,9 @@ public class SuitRenderer {
 		return render( drawable, width, height, true );
 	}
 
-	/*drawable.setBounds( -i * 10, 0, -i * 10 + 40, 10 );
-	drawable.draw( canvas );
-	canvas = new Canvas( revSuit[i] );
-	canvas.rotate( 180 );
-	drawable.setBounds( -i * 10 - 10, -10, -i * 10 + 30, 0 );*/
-
 	protected Bitmap[] render( Drawable drawable, int width, int height, boolean reversed ) {
 		Bitmap[] suits = new Bitmap[4];
+		drawable.setFilterBitmap( true );
 		for ( int i = 0; i < 4; i++ ) {
 			suits[i] = Bitmap.createBitmap( width, height, Bitmap.Config.ARGB_4444 );
 			Canvas canvas = new Canvas( suits[i] );
