@@ -18,8 +18,6 @@ public class LargeSuitCardRenderer extends CardRenderer {
 		Paint cardBorderPaint = new Paint();
 		Bitmap[] bigSuit;
 		Bitmap[] suit;
-		Bitmap[] blackFont;
-		Bitmap[] redFont;
 		Canvas canvas;
 		int width = Card.getWidth();
 		int height = Card.getHeight();
@@ -30,11 +28,7 @@ public class LargeSuitCardRenderer extends CardRenderer {
 		bigSuit = suitRenderer.render( bigSuitDrawable, 25, 25 );
 		suit    = suitRenderer.render( suitDrawable, 10, 10 );
 
-		FontRenderer fontRenderer  = new FontRenderer( 18, 15 );
-		Drawable blackFontDrawable = resources.getDrawable( R.drawable.bigblackfont );
-		Drawable redFontDrawable   = resources.getDrawable( R.drawable.bigredfont );
-		blackFont = fontRenderer.render( blackFontDrawable );
-		redFont   = fontRenderer.render( redFontDrawable );
+		prepareFonts( false );
 
 		cardBorderPaint.setARGB( 255, 0, 0, 0 );
 		cardFrontPaint.setARGB( 255, 255, 255, 255 );

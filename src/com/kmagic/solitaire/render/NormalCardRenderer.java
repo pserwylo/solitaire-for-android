@@ -7,8 +7,6 @@ import com.kmagic.solitaire.*;
 
 public class NormalCardRenderer extends CardRenderer {
 
-	private final SizeCalculator size = new SizeCalculator();
-
 	private Paint cardFrontPaint = new Paint();
 	private Paint cardBorderPaint = new Paint();
 
@@ -16,10 +14,6 @@ public class NormalCardRenderer extends CardRenderer {
 	private Bitmap[] revSuit = new Bitmap[4];
 	private Bitmap[] smallSuit = new Bitmap[4];
 	private Bitmap[] revSmallSuit = new Bitmap[4];
-	private Bitmap[] blackFont = new Bitmap[13];
-	private Bitmap[] revBlackFont = new Bitmap[13];
-	private Bitmap[] redFont = new Bitmap[13];
-	private Bitmap[] revRedFont = new Bitmap[13];
 	private Bitmap redJack;
 	private Bitmap redQueen;
 	private Bitmap redKing;
@@ -32,6 +26,8 @@ public class NormalCardRenderer extends CardRenderer {
 
 		cardBorderPaint.setARGB( 255, 0, 0, 0 );
 		cardFrontPaint.setARGB( 255, 255, 255, 255 );
+		cardBorderPaint.setAntiAlias( true );
+		cardFrontPaint.setAntiAlias( true );
 	}
 
 	private void prepareSuits() {
@@ -69,24 +65,11 @@ public class NormalCardRenderer extends CardRenderer {
 
 	}
 
-	private void prepareFonts() {
-		FontRenderer renderer = new FontRenderer( size.FONT_WIDTH, size.FONT_HEIGHT );
-
-		Drawable blackFontDrawable = resources.getDrawable( R.drawable.font_black_195x18 );
-		blackFont    = renderer.render( blackFontDrawable );
-		revBlackFont = renderer.renderReversed( blackFontDrawable );
-
-		Drawable redFontDrawable = resources.getDrawable( R.drawable.font_black_195x18 );
-		redFontDrawable.setColorFilter( 0xffff0000, PorterDuff.Mode.SRC_ATOP );
-		redFont    = renderer.render( redFontDrawable );
-		revRedFont = renderer.renderReversed( redFontDrawable );
-	}
-
 	public void renderCards() {
 
 		prepareSuits();
 		prepareFaces();
-		prepareFonts();
+		prepareFonts( true );
 
 		for ( int suitIdx = 0; suitIdx < 4; suitIdx++ ) {
 			for ( int valueIdx = 0; valueIdx < 13; valueIdx++ ) {
