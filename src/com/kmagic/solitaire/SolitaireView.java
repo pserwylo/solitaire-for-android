@@ -125,6 +125,8 @@ public class SolitaireView extends View {
 		setFocusableInTouchMode( true );
 		requestFocus();
 
+		SolitairePrefs prefs = new SolitairePrefs( mContext );
+
 		SharedPreferences.Editor editor = GetSettings().edit();
 		if ( mRules != null ) {
 			if ( mRules.HasScore() ) {
@@ -147,13 +149,13 @@ public class SolitaireView extends View {
 			mRules.SetCarryOverScore( oldScore );
 		}
 		Card.SetSize( gameType, calcScreenSize() );
-		mDrawMaster.DrawCards( GetSettings().getBoolean( "DisplayBigCards", false ) );
+		mDrawMaster.DrawCards( prefs.displayBigCards() );
 		mCardAnchor = mRules.GetAnchorArray();
 		if ( mDrawMaster.GetWidth() > 1 ) {
 			mRules.Resize( mDrawMaster.GetWidth(), mDrawMaster.GetHeight() );
 			Refresh();
 		}
-		SetDisplayTime( GetSettings().getBoolean( "DisplayTime", true ) );
+		SetDisplayTime( prefs.displayTime() );
 		editor.putInt( "LastType", gameType );
 		editor.commit();
 		mStartTime = SystemClock.uptimeMillis();
@@ -357,7 +359,8 @@ public class SolitaireView extends View {
 	}
 
 	public boolean LoadSave() {
-		mDrawMaster.DrawCards( GetSettings().getBoolean( "DisplayBigCards", false ) );
+		SolitairePrefs prefs = new SolitairePrefs( mContext );
+		mDrawMaster.DrawCards( prefs.displayBigCards() );
 		mTimePaused = true;
 
 		try {
@@ -396,7 +399,7 @@ public class SolitaireView extends View {
 			mGameStarted = !mMoveHistory.isEmpty();
 			mRules = Rules.CreateRules( type, map, this, mMoveHistory, mAnimateCard );
 			Card.SetSize( type, calcScreenSize() );
-			SetDisplayTime( GetSettings().getBoolean( "DisplayTime", true ) );
+			SetDisplayTime( prefs.displayTime() );
 			mCardAnchor = mRules.GetAnchorArray();
 			if ( mDrawMaster.GetWidth() > 1 ) {
 				mRules.Resize( mDrawMaster.GetWidth(), mDrawMaster.GetHeight() );
@@ -902,7 +905,8 @@ public class SolitaireView extends View {
 
 	public void RefreshOptions() {
 		mRules.RefreshOptions();
-		SetDisplayTime( GetSettings().getBoolean( "DisplayTime", true ) );
+		SolitairePrefs prefs = new SolitairePrefs( mContext );
+		SetDisplayTime( prefs.displayTime() );
 	}
 }
 

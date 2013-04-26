@@ -34,12 +34,9 @@ public abstract class Rules {
 	public static final int EVENT_SMART_MOVE = 4;
 	public static final int EVENT_DEAL_NEXT = 5;
 
-	public static final int AUTO_MOVE_ALWAYS = 2;
-	public static final int AUTO_MOVE_FLING_ONLY = 1;
-	public static final int AUTO_MOVE_NEVER = 0;
-
 	private int mType;
 	protected SolitaireView mView;
+	protected SolitairePrefs mPrefs;
 	protected Stack<Move> mMoveHistory;
 	protected AnimateCard mAnimateCard;
 	protected boolean mIgnoreEvents;
@@ -54,7 +51,7 @@ public abstract class Rules {
 	protected int mCardCount;
 
 	// Automove
-	protected int mAutoMoveLevel;
+	protected SolitairePrefs.AutoMove mAutoMoveLevel;
 	protected boolean mWasFling;
 
 	public int GetType() {
@@ -75,6 +72,7 @@ public abstract class Rules {
 
 	public void SetView( SolitaireView view ) {
 		mView = view;
+		mPrefs = new SolitairePrefs( view.getContext() );
 	}
 
 	public void SetMoveHistory( Stack<Move> moveHistory ) {
@@ -186,7 +184,7 @@ public abstract class Rules {
 	}
 
 	public void RefreshOptions() {
-		mAutoMoveLevel = mView.GetSettings().getInt( "AutoMoveLevel", Rules.AUTO_MOVE_ALWAYS );
+		mAutoMoveLevel = mPrefs.autoMove();
 		mWasFling = false;
 	}
 
@@ -231,7 +229,7 @@ class NormalSolitaire extends Rules {
 	@Override
 	public void Init( Bundle map ) {
 		mIgnoreEvents = true;
-		mDealThree = mView.GetSettings().getBoolean( "SolitaireDealThree", true );
+		mDealThree = mPrefs.klondikeCardsToDeal() == 3;
 
 		// Thirteen total anchors for regular solitaire
 		mCardCount = 52;
@@ -305,7 +303,7 @@ class NormalSolitaire extends Rules {
 			mCardAnchor[0].AddCard( mDeck.PopCard() );
 		}
 
-		if ( mView.GetSettings().getBoolean( "SolitaireStyleNormal", true ) ) {
+		if ( mPrefs.klondikeScoring() == SolitairePrefs.KlondikeScoring.NORMAL ) {
 			mDealsLeft = -1;
 		} else {
 			mDealsLeft = mDealThree ? 2 : 0;
@@ -388,7 +386,8 @@ class NormalSolitaire extends Rules {
 				mCardAnchor[4].GetCount() == 13 && mCardAnchor[5].GetCount() == 13 ) {
 				SignalWin();
 			} else {
-				if ( mAutoMoveLevel == AUTO_MOVE_ALWAYS || (mAutoMoveLevel == AUTO_MOVE_FLING_ONLY && mWasFling) ) {
+				if ( mAutoMoveLevel == SolitairePrefs.AutoMove.ALWAYS ||
+					 (mAutoMoveLevel == SolitairePrefs.AutoMove.FLING && mWasFling) ) {
 					EventAlert( EVENT_SMART_MOVE );
 				} else {
 					mView.StopAnimating();
@@ -615,7 +614,7 @@ class Spider extends Rules {
 			}
 		}
 
-		int suits = mView.GetSettings().getInt( "SpiderSuits", 4 );
+		int suits = mPrefs.spiderNumSuits();
 		mDeck = new Deck( 2, suits );
 		int i = 54;
 		while ( i > 0 ) {
@@ -711,7 +710,7 @@ class Spider extends Rules {
 
 	@Override
 	public String GetGameTypeString() {
-		int suits = mView.GetSettings().getInt( "SpiderSuits", 4 );
+		int suits = mPrefs.spiderNumSuits();
 		if ( suits == 1 ) {
 			return "Spider1Suit";
 		} else if ( suits == 2 ) {
@@ -723,7 +722,7 @@ class Spider extends Rules {
 
 	@Override
 	public String GetPrettyGameTypeString() {
-		int suits = mView.GetSettings().getInt( "SpiderSuits", 4 );
+		int suits = mPrefs.spiderNumSuits();
 		if ( suits == 1 ) {
 			return "Spider One Suit";
 		} else if ( suits == 2 ) {
@@ -834,7 +833,8 @@ class Freecell extends Rules {
 					mCardAnchor[6].GetCount() == 13 && mCardAnchor[7].GetCount() == 13 ) {
 					SignalWin();
 				} else {
-					if ( mAutoMoveLevel == AUTO_MOVE_ALWAYS || (mAutoMoveLevel == AUTO_MOVE_FLING_ONLY && mWasFling) ) {
+					if ( mAutoMoveLevel == SolitairePrefs.AutoMove.ALWAYS ||
+						(mAutoMoveLevel == SolitairePrefs.AutoMove.FLING && mWasFling) ) {
 						EventAlert( EVENT_SMART_MOVE );
 					} else {
 						mView.StopAnimating();
@@ -1108,7 +1108,8 @@ class FortyThieves extends Rules {
 					mCardAnchor[16].GetCount() == 13 && mCardAnchor[17].GetCount() == 13 ) {
 					SignalWin();
 				} else {
-					if ( mAutoMoveLevel == AUTO_MOVE_ALWAYS || (mAutoMoveLevel == AUTO_MOVE_FLING_ONLY && mWasFling) ) {
+					if ( mAutoMoveLevel == SolitairePrefs.AutoMove.ALWAYS
+						|| (mAutoMoveLevel == SolitairePrefs.AutoMove.FLING && mWasFling) ) {
 						mEventPoster.PostEvent( EVENT_SMART_MOVE );
 					} else {
 						mView.StopAnimating();

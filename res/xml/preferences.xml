@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="org.kmagic.solitaire">
 
 	<CheckBoxPreference
-		android:key="DisplayBigCards"
+		android:key="displayBigCards"
 		android:title="@string/big_cards"
 		android:summary="Use large card images"
 		android:summaryOn="Large card images"
@@ -11,7 +13,7 @@
 		android:defaultValue="false" />
 
 	<CheckBoxPreference
-		android:key="DisplayTime"
+		android:key="displayTime"
 		android:title="@string/display_time"
 		android:summary="Show time during game"
 		android:summaryOn="Show timer during game"
@@ -19,7 +21,7 @@
 		android:defaultValue="true" />
 
 	<ListPreference
-		android:key="auto_move"
+		android:key="autoMove"
 		android:title="Automatically move cards"
 		android:dialogTitle="When to automatically move cards"
 		android:entries="@array/auto_move_entries"
@@ -28,10 +30,10 @@
 
 	<PreferenceCategory
 		android:title="Klondike solitaire"
-		android:key="settings_klondike">
+		android:key="gameKlondike">
 
 		<ListPreference
-			android:key="klondike_deal_mode"
+			android:key="klondikeDealMode"
 			android:title="Dealing mode"
 			android:dialogTitle="Dealing"
 			android:entries="@array/klondike_deal_entries"
@@ -40,7 +42,7 @@
 			android:defaultValue="3" />
 
 		<ListPreference
-			android:key="klondike_scoring"
+			android:key="klondikeScoring"
 			android:title="Scoring mode"
 			android:dialogTitle="Scoring"
 			android:entries="@array/klondike_scoring_entries"
@@ -52,10 +54,10 @@
 
 	<PreferenceCategory
 		android:title="Spider solitaire"
-		android:key="settings_solitaire">
+		android:key="gameSpider">
 
 		<ListPreference
-			android:key="spider_num_suits"
+			android:key="spiderNumSuits"
 			android:title="Number of suits"
 			android:dialogTitle="Dealing"
 			android:entries="@array/spider_num_suits_entries"
@@ -64,6 +66,5 @@
 			android:defaultValue="2" />
 
 	</PreferenceCategory>
-
 
 </PreferenceScreen>
