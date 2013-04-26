@@ -172,6 +172,13 @@ public abstract class Rules {
 
 	abstract public void Resize( int width, int height );
 
+	/**
+	 * Most games don't have any extra actions, so default to an empty array.
+	 */
+	public GameAction[] getActions() {
+		return new GameAction[ 0 ];
+	}
+
 	public boolean Fling( MoveCard moveCard ) {
 		moveCard.Release();
 		return false;
@@ -646,8 +653,10 @@ class Spider extends Rules {
 		}
 		// These two are offscreen as the user doesn't need to see them, but they
 		// are needed to hold onto out of play cards.
-		mCardAnchor[10].SetPosition( -5000, -5000 );
-		mCardAnchor[11].SetPosition( -5000, -5000 );
+		// But only put them *just* off screen, because dealing from them is animated,
+		// and we don't want to have to deal from 10000 pixels away...
+		mCardAnchor[10].SetPosition( - Card.getWidth() - 10 , 0 );
+		mCardAnchor[11].SetPosition( - Card.getWidth() - 10, 0 );
 	}
 
 	@Override
@@ -657,6 +666,26 @@ class Spider extends Rules {
 	@Override
 	public void EventProcess( int event, CardAnchor anchor, Card card ) {
 		anchor.AddCard( card );
+	}
+
+	@Override
+	public GameAction[] getActions() {
+		GameAction dealAction = new GameAction( R.drawable.action_deal, new GameAction.Listener() {
+			@Override
+			public void onActionPerformed( GameAction action ) {
+				deal();
+			}
+		});
+		return new GameAction[]{ dealAction };
+	}
+
+	private void deal() {
+		if ( mCardAnchor[10].GetCount() > 0 ) {
+			int count = mCardAnchor[10].GetCount() > 10 ? 10 : mCardAnchor[10].GetCount();
+			mAnimateCard.MoveCard( mCardAnchor[10].PopCard(), mCardAnchor[0] );
+			mMoveHistory.push( new Move( 10, 0, count - 1, 1, false, false ) );
+			mStillDealing = true;
+		}
 	}
 
 	@Override
@@ -692,12 +721,7 @@ class Spider extends Rules {
 				EventAlert( EVENT_DEAL_NEXT, mCardAnchor[anchor.GetNumber() + 1] );
 			}
 		} else if ( event == EVENT_DEAL ) {
-			if ( mCardAnchor[10].GetCount() > 0 ) {
-				int count = mCardAnchor[10].GetCount() > 10 ? 10 : mCardAnchor[10].GetCount();
-				mAnimateCard.MoveCard( mCardAnchor[10].PopCard(), mCardAnchor[0] );
-				mMoveHistory.push( new Move( 10, 0, count - 1, 1, false, false ) );
-				mStillDealing = true;
-			}
+			deal();
 		} else if ( event == EVENT_DEAL_NEXT ) {
 			if ( mCardAnchor[10].GetCount() > 0 && anchor.GetNumber() < 10 ) {
 				mAnimateCard.MoveCard( mCardAnchor[10].PopCard(), anchor );
@@ -807,10 +831,11 @@ class Freecell extends Rules {
 
 	public void Resize( int width, int height ) {
 		int rem = (width - (Card.getWidth() * 8)) / 8;
+		int gutterSize = mView.calcGutterSize();
 		for ( int i = 0; i < 8; i++ ) {
 			mCardAnchor[i].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 10 );
 			mCardAnchor[i + 8].SetPosition( rem / 2 + i * (rem + Card.getWidth()), 30 + Card.getHeight() );
-			mCardAnchor[i + 8].SetMaxHeight( height - 30 - Card.getHeight() );
+			mCardAnchor[i + 8].SetMaxHeight( height - 30 - Card.getHeight() - gutterSize );
 		}
 
 		// Setup edge cards (Touch sensor loses sensitivity towards the edge).

@@ -48,13 +48,16 @@ public class DrawMaster {
 	private Bitmap mBoardBitmap;
 	private Canvas mBoardCanvas;
 
-	public DrawMaster( Context context ) {
+	private SolitaireView mView;
 
-		mContext = context;
+	public DrawMaster( SolitaireView view ) {
 
-		WindowManager wm = (WindowManager)context.getSystemService( Context.WINDOW_SERVICE );
-		mScreenWidth  = wm.getDefaultDisplay().getWidth();
-		mScreenHeight = wm.getDefaultDisplay().getHeight();
+		mContext = view.getContext();
+		mView = view;
+
+		Point screenSize = mView.calcScreenSize();
+		mScreenWidth  = screenSize.x;
+		mScreenHeight = screenSize.y;
 
 		// Background
 		mBGPaint = new Paint();

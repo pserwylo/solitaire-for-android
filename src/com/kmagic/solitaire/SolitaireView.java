@@ -22,6 +22,7 @@ import android.os.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+import com.kmagic.solitaire.widget.*;
 
 import java.io.*;
 import java.util.*;
@@ -83,7 +84,7 @@ public class SolitaireView extends View {
 		setFocusable( true );
 		setFocusableInTouchMode( true );
 
-		mDrawMaster = new DrawMaster( context );
+		mDrawMaster = new DrawMaster( this );
 		mMoveCard = new MoveCard();
 		mSelectCard = new SelectCard();
 		mViewMode = MODE_NORMAL;
@@ -106,7 +107,20 @@ public class SolitaireView extends View {
 		mWinningScore = 0;
 	}
 
-	private Point calcScreenSize() {
+	/**
+	 * dpi to px
+	 * http://developer.android.com/guide/practices/screens_support.html#screen-independence
+	 */
+	public int calcGutterSize() {
+		final float GUTTER_SIZE_DP = 24.0f;
+		final float scale = getResources().getDisplayMetrics().density;
+		return (int) (GUTTER_SIZE_DP * scale + 0.5f);
+	}
+
+	/**
+	 * Leaves a gutter at the bottom for status and action buttons.
+	 */
+	public Point calcScreenSize() {
 		WindowManager wm = (WindowManager)getContext().getSystemService( Context.WINDOW_SERVICE );
 		Point screenSize = new Point();
 		screenSize.set(
@@ -155,6 +169,9 @@ public class SolitaireView extends View {
 			mRules.Resize( mDrawMaster.GetWidth(), mDrawMaster.GetHeight() );
 			Refresh();
 		}
+
+		setupActions();
+
 		SetDisplayTime( prefs.displayTime() );
 		editor.putInt( "LastType", gameType );
 		editor.commit();
@@ -163,6 +180,19 @@ public class SolitaireView extends View {
 		mTimePaused = false;
 		mPaused = false;
 		mGameStarted = false;
+	}
+
+	/**
+	 * Setup on-screen action buttons according to the current game (mRules).
+	 */
+	private void setupActions() {
+		ActionButton btn1 = (ActionButton)((Solitaire) mContext).findViewById( R.id.btn_action_1 );
+		GameAction[] actions = mRules.getActions();
+		if ( actions.length == 0 ) {
+			btn1.setAction( null );
+		} else {
+			btn1.setAction( actions[ 0 ] );
+		}
 	}
 
 	public SharedPreferences GetSettings() {
@@ -859,16 +889,16 @@ public class SolitaireView extends View {
 		int diffCardCount;
 		int matchCount;
 		String type = mRules.GetGameTypeString();
-		if ( type == "Spider1Suit" ) {
+		if ( type.equals( "Spider1Suit" ) ) {
 			cardCount = 13;
 			matchCount = 8;
-		} else if ( type == "Spider2Suit" ) {
+		} else if ( type.equals( "Spider2Suit" ) ) {
 			cardCount = 26;
 			matchCount = 4;
-		} else if ( type == "Spider4Suit" ) {
+		} else if ( type.equals( "Spider4Suit" ) ) {
 			cardCount = 52;
 			matchCount = 2;
-		} else if ( type == "Forty Thieves" ) {
+		} else if ( type.equals( "Forty Thieves" ) ) {
 			cardCount = 52;
 			matchCount = 2;
 		} else {
@@ -908,6 +938,7 @@ public class SolitaireView extends View {
 		SolitairePrefs prefs = new SolitairePrefs( mContext );
 		SetDisplayTime( prefs.displayTime() );
 	}
+
 }
 
 class RefreshHandler implements Runnable {
