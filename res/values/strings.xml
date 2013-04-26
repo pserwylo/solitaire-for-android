@@ -64,4 +64,5 @@ Menu:\n
 Change the gametype, save, options, and view this help.
 </string>
     <string name="win_text">You Win!\n\nUse the menu to start a new game.</string>
+	<string name="menu">Menu</string>
 </resources>

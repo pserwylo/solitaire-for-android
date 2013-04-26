@@ -47,7 +47,8 @@ public class SolitaireView extends View {
 	private CardAnchor[] mCardAnchor;
 	private DrawMaster mDrawMaster;
 	private Rules mRules;
-	private TextView mTextView;
+	private TextView mHelpTextView;
+	private TextView mStatusTextView;
 	private AnimateCard mAnimateCard;
 
 	private MoveCard mMoveCard;
@@ -139,7 +140,7 @@ public class SolitaireView extends View {
 			}
 		}
 		ChangeViewMode( MODE_NORMAL );
-		mTextView.setVisibility( View.INVISIBLE );
+		mHelpTextView.setVisibility( View.INVISIBLE );
 		mMoveHistory.clear();
 		mRules = Rules.CreateRules( gameType, null, this, mMoveHistory, mAnimateCard );
 		if ( oldGameType == mRules.GetGameTypeString() ) {
@@ -220,7 +221,7 @@ public class SolitaireView extends View {
 				DrawBoard();
 				break;
 			case MODE_TEXT:
-				mTextView.setVisibility( View.INVISIBLE );
+				mHelpTextView.setVisibility( View.INVISIBLE );
 				break;
 			case MODE_ANIMATE:
 				mRefreshHandler.SetRefresh( RefreshHandler.SINGLE_REFRESH );
@@ -228,7 +229,7 @@ public class SolitaireView extends View {
 			case MODE_WIN:
 			case MODE_WIN_STOP:
 				if ( newMode != MODE_WIN_STOP ) {
-					mTextView.setVisibility( View.INVISIBLE );
+					mHelpTextView.setVisibility( View.INVISIBLE );
 				}
 				DrawBoard();
 				mReplay.StopPlaying();
@@ -431,8 +432,12 @@ public class SolitaireView extends View {
 		mRefreshHandler.SingleRefresh();
 	}
 
-	public void SetTextView( TextView textView ) {
-		mTextView = textView;
+	public void SetHelpTextView( TextView textView ) {
+		mHelpTextView = textView;
+	}
+
+	public void SetStatusTextView( TextView textView ) {
+		mStatusTextView = textView;
 	}
 
 	protected void onSizeChanged( int w, int h, int oldw, int oldh ) {
@@ -442,18 +447,18 @@ public class SolitaireView extends View {
 	}
 
 	public void DisplayHelp() {
-		mTextView.setTextSize( 15 );
-		mTextView.setGravity( Gravity.LEFT );
-		DisplayText( mHelpText );
+		mHelpTextView.setTextSize( 15 );
+		mHelpTextView.setGravity( Gravity.LEFT );
+		DisplayHelpText( mHelpText );
 	}
 
 	public void DisplayWin() {
 		MarkWin();
-		mTextView.setTextSize( 24 );
-		mTextView.setGravity( Gravity.CENTER_HORIZONTAL );
-		DisplayText( mWinText );
+		mHelpTextView.setTextSize( 24 );
+		mHelpTextView.setGravity( Gravity.CENTER_HORIZONTAL );
+		DisplayHelpText( mWinText );
 		ChangeViewMode( MODE_WIN );
-		mTextView.setVisibility( View.VISIBLE );
+		mHelpTextView.setVisibility( View.VISIBLE );
 		mRules.SetIgnoreEvents( true );
 		mReplay.StartReplay( mMoveHistory, mCardAnchor );
 	}
@@ -467,10 +472,10 @@ public class SolitaireView extends View {
 		Refresh();
 	}
 
-	public void DisplayText( CharSequence text ) {
+	public void DisplayHelpText( CharSequence text ) {
 		ChangeViewMode( MODE_TEXT );
-		mTextView.setVisibility( View.VISIBLE );
-		mTextView.setText( text );
+		mHelpTextView.setVisibility( View.VISIBLE );
+		mHelpTextView.setText( text );
 		Refresh();
 	}
 
@@ -492,12 +497,29 @@ public class SolitaireView extends View {
 			DrawBoard();
 		}
 		mDrawMaster.DrawLastBoard( canvas );
+		String status = "";
 		if ( mDisplayTime ) {
-			mDrawMaster.DrawTime( canvas, mElapsed );
+			int seconds = (mElapsed / 1000) % 60;
+			int minutes = mElapsed / 60000;
+			String time;
+			// String.format is insanely slow (~15ms)
+			if ( seconds < 10 ) {
+				time = minutes + ":0" + seconds;
+			} else {
+				time = minutes + ":" + seconds;
+			}
+			status += time;
+			if ( mRules.HasString() ) {
+				status += "\n";
+			}
+			// mDrawMaster.DrawTime( canvas, mElapsed );
 		}
 		if ( mRules.HasString() ) {
-			mDrawMaster.DrawRulesString( canvas, mRules.GetString() );
+			status += mRules.GetString();
+			// mDrawMaster.DrawRulesString( canvas, mRules.GetString() );
 		}
+
+		mStatusTextView.setText( status );
 
 		switch ( mViewMode ) {
 			case MODE_MOVE_CARD:
@@ -860,9 +882,9 @@ public class SolitaireView extends View {
 				Card card = mCardAnchor[i].GetCards()[j];
 				int idx = card.GetSuit() * 13 + card.GetValue() - 1;
 				if ( cards[idx] >= matchCount ) {
-					mTextView.setTextSize( 20 );
-					mTextView.setGravity( Gravity.CENTER );
-					DisplayText( "Sanity Check Failed\nExtra: " + card.GetValue() + " " + card.GetSuit() );
+					mHelpTextView.setTextSize( 20 );
+					mHelpTextView.setGravity( Gravity.CENTER );
+					DisplayHelpText( "Sanity Check Failed\nExtra: " + card.GetValue() + " " + card.GetSuit() );
 					return;
 				}
 				cards[idx]++;
@@ -870,9 +892,9 @@ public class SolitaireView extends View {
 		}
 		for ( int i = 0; i < cardCount; i++ ) {
 			if ( cards[i] != matchCount ) {
-				mTextView.setTextSize( 20 );
-				mTextView.setGravity( Gravity.CENTER );
-				DisplayText( "Sanity Check Failed\nMissing: " + (i % 13 + 1) + " " + i / 13 );
+				mHelpTextView.setTextSize( 20 );
+				mHelpTextView.setGravity( Gravity.CENTER );
+				DisplayHelpText( "Sanity Check Failed\nMissing: " + (i % 13 + 1) + " " + i / 13 );
 				return;
 			}
 		}

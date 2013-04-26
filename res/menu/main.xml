@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<item
+		android:title="@string/menu_newgame"
+		android:id="@+id/menu_new_game">
+		<menu>
+			<item
+				android:title="@string/menu_solitaire"
+				android:id="@+id/menu_solitaire" />
+			<item
+				android:title="@string/menu_spider"
+				android:id="@+id/menu_spider" />
+			<item
+				android:title="@string/menu_freecell"
+				android:id="@+id/menu_free_cell" />
+			<item
+				android:title="@string/menu_fortythieves"
+				android:id="@+id/menu_forty_thieves" />
+		</menu>
+	</item>
+
+	<item
+		android:title="@string/menu_restart"
+		android:id="@+id/menu_restart" />
+
+	<item
+		android:title="@string/menu_options"
+		android:id="@+id/menu_options" />
+
+	<item
+		android:title="@string/menu_save_quit"
+		android:id="@+id/menu_save_quit" />
+
+	<item
+		android:title="@string/menu_quit"
+		android:id="@+id/menu_quit" />
+
+	<item
+		android:title="@string/menu_stats"
+		android:id="@+id/menu_stats" />
+
+	<item
+		android:title="@string/menu_help"
+		android:id="@+id/menu_help" />
+
+</menu>
