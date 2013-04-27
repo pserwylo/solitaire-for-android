@@ -16,15 +16,14 @@
 package com.kmagic.solitaire;
 
 import android.content.*;
-import android.content.res.*;
 import android.graphics.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
+import com.kmagic.solitaire.io.*;
 import com.kmagic.solitaire.widget.*;
 
-import java.io.*;
 import java.util.*;
 
 // The brains of the operation
@@ -37,10 +36,6 @@ public class SolitaireView extends View {
 	private static final int MODE_ANIMATE = 5;
 	private static final int MODE_WIN = 6;
 	private static final int MODE_WIN_STOP = 7;
-
-	private static final String SAVE_FILENAME = "solitaire_save.bin";
-	// This is incremented only when the save system changes.
-	private static final String SAVE_VERSION = "solitaire_save_2";
 
 	private CharSequence mHelpText;
 	private CharSequence mWinText;
@@ -98,7 +93,6 @@ public class SolitaireView extends View {
 		mSpeed = new Speed();
 		mReplay = new Replay( this, mAnimateCard );
 
-		Resources res = context.getResources();
 		mHelpText = context.getResources().getText( R.string.help_text );
 		mWinText = context.getResources().getText( R.string.win_text );
 		mContext = context;
@@ -130,6 +124,11 @@ public class SolitaireView extends View {
 		return screenSize;
 	}
 
+	public void InitGame() {
+		AppState state = new AppState( mContext );
+		InitGame( state.getMostRecentGame() );
+	}
+
 	public void InitGame( int gameType ) {
 		int oldScore = 0;
 		String oldGameType = "None";
@@ -140,8 +139,8 @@ public class SolitaireView extends View {
 		requestFocus();
 
 		SolitairePrefs prefs = new SolitairePrefs( mContext );
+		AppState state = new AppState( mContext );
 
-		SharedPreferences.Editor editor = GetSettings().edit();
 		if ( mRules != null ) {
 			if ( mRules.HasScore() ) {
 				if ( mViewMode == MODE_WIN || mViewMode == MODE_WIN_STOP ) {
@@ -150,8 +149,8 @@ public class SolitaireView extends View {
 					oldScore = mRules.GetScore();
 				}
 				oldGameType = mRules.GetGameTypeString();
-				if ( oldScore > GetSettings().getInt( mRules.GetGameTypeString() + "Score", -52 ) ) {
-					editor.putInt( mRules.GetGameTypeString() + "Score", oldScore );
+				if ( oldScore > state.getGameScore( mRules ) ) {
+					state.setGameScore( mRules, oldScore );
 				}
 			}
 		}
@@ -159,7 +158,7 @@ public class SolitaireView extends View {
 		mHelpTextView.setVisibility( View.INVISIBLE );
 		mMoveHistory.clear();
 		mRules = Rules.CreateRules( gameType, null, this, mMoveHistory, mAnimateCard );
-		if ( oldGameType == mRules.GetGameTypeString() ) {
+		if ( oldGameType.equals( mRules.GetGameTypeString() ) ) {
 			mRules.SetCarryOverScore( oldScore );
 		}
 		Card.SetSize( gameType, calcScreenSize() );
@@ -173,8 +172,7 @@ public class SolitaireView extends View {
 		setupActions();
 
 		SetDisplayTime( prefs.displayTime() );
-		editor.putInt( "LastType", gameType );
-		editor.commit();
+		state.setMostRecentGame( gameType );
 		mStartTime = SystemClock.uptimeMillis();
 		mElapsed = 0;
 		mTimePaused = false;
@@ -193,10 +191,6 @@ public class SolitaireView extends View {
 		} else {
 			btn1.setAction( actions[ 0 ] );
 		}
-	}
-
-	public SharedPreferences GetSettings() {
-		return ((Solitaire) mContext).GetSettings();
 	}
 
 	public DrawMaster GetDrawMaster() {
@@ -305,10 +299,9 @@ public class SolitaireView extends View {
 				ChangeViewMode( MODE_NORMAL );
 			}
 
-			if ( mRules != null && mRules.GetScore() > GetSettings().getInt( mRules.GetGameTypeString() + "Score", -52 ) ) {
-				SharedPreferences.Editor editor = GetSettings().edit();
-				editor.putInt( mRules.GetGameTypeString() + "Score", mRules.GetScore() );
-				editor.commit();
+			AppState state = new AppState( mContext );
+			if ( mRules != null && mRules.GetScore() > state.getGameScore( mRules ) ) {
+				state.setGameScore( mRules );
 			}
 		}
 	}
@@ -320,71 +313,7 @@ public class SolitaireView extends View {
 		}
 
 		if ( mRules != null && mViewMode == MODE_NORMAL ) {
-			try {
-
-				FileOutputStream fout = mContext.openFileOutput( SAVE_FILENAME, 0 );
-				ObjectOutputStream oout = new ObjectOutputStream( fout );
-
-				int cardCount = mRules.GetCardCount();
-				int[] value = new int[cardCount];
-				int[] suit = new int[cardCount];
-				int[] anchorCardCount = new int[mCardAnchor.length];
-				int[] anchorHiddenCount = new int[mCardAnchor.length];
-				int historySize = mMoveHistory.size();
-				int[] historyFrom = new int[historySize];
-				int[] historyToBegin = new int[historySize];
-				int[] historyToEnd = new int[historySize];
-				int[] historyCount = new int[historySize];
-				int[] historyFlags = new int[historySize];
-				Card[] card;
-
-				cardCount = 0;
-				for ( int i = 0; i < mCardAnchor.length; i++ ) {
-					anchorCardCount[i] = mCardAnchor[i].GetCount();
-					anchorHiddenCount[i] = mCardAnchor[i].GetHiddenCount();
-					card = mCardAnchor[i].GetCards();
-					for ( int j = 0; j < anchorCardCount[i]; j++, cardCount++ ) {
-						value[cardCount] = card[j].GetValue();
-						suit[cardCount] = card[j].GetSuit();
-					}
-				}
-
-				for ( int i = 0; i < historySize; i++ ) {
-					Move move = mMoveHistory.pop();
-					historyFrom[i] = move.GetFrom();
-					historyToBegin[i] = move.GetToBegin();
-					historyToEnd[i] = move.GetToEnd();
-					historyCount[i] = move.GetCount();
-					historyFlags[i] = move.GetFlags();
-				}
-
-				oout.writeObject( SAVE_VERSION );
-				oout.writeInt( mCardAnchor.length );
-				oout.writeInt( cardCount );
-				oout.writeInt( mRules.GetType() );
-				oout.writeObject( anchorCardCount );
-				oout.writeObject( anchorHiddenCount );
-				oout.writeObject( value );
-				oout.writeObject( suit );
-				oout.writeInt( mRules.GetRulesExtra() );
-				oout.writeInt( mRules.GetScore() );
-				oout.writeInt( mElapsed );
-				oout.writeObject( historyFrom );
-				oout.writeObject( historyToBegin );
-				oout.writeObject( historyToEnd );
-				oout.writeObject( historyCount );
-				oout.writeObject( historyFlags );
-				oout.close();
-
-				SharedPreferences.Editor editor = GetSettings().edit();
-				editor.putBoolean( "SolitaireSaveValid", true );
-				editor.commit();
-
-			} catch ( FileNotFoundException e ) {
-				Log.e( "SolitaireView.java", "onStop(): File not found" );
-			} catch ( IOException e ) {
-				Log.e( "SolitaireView.java", "onStop(): IOException" );
-			}
+			new GameSaver( mContext, mRules, mMoveHistory, mElapsed ).save();
 		}
 	}
 
@@ -393,60 +322,24 @@ public class SolitaireView extends View {
 		mDrawMaster.DrawCards( prefs.displayBigCards() );
 		mTimePaused = true;
 
-		try {
-			FileInputStream fin = mContext.openFileInput( SAVE_FILENAME );
-			ObjectInputStream oin = new ObjectInputStream( fin );
+		GameLoader loader = new GameLoader( this, mAnimateCard );
+		if ( loader.load() ) {
 
-			String version = (String) oin.readObject();
-			if ( !version.equals( SAVE_VERSION ) ) {
-				Log.e( "SolitaireView.java", "Invalid save version" );
-				return false;
-			}
-			Bundle map = new Bundle();
-
-			map.putInt( "cardAnchorCount", oin.readInt() );
-			map.putInt( "cardCount", oin.readInt() );
-			int type = oin.readInt();
-			map.putIntArray( "anchorCardCount", (int[]) oin.readObject() );
-			map.putIntArray( "anchorHiddenCount", (int[]) oin.readObject() );
-			map.putIntArray( "value", (int[]) oin.readObject() );
-			map.putIntArray( "suit", (int[]) oin.readObject() );
-			map.putInt( "rulesExtra", oin.readInt() );
-			map.putInt( "score", oin.readInt() );
-			mElapsed = oin.readInt();
-			mStartTime = SystemClock.uptimeMillis() - mElapsed;
-			int[] historyFrom = (int[]) oin.readObject();
-			int[] historyToBegin = (int[]) oin.readObject();
-			int[] historyToEnd = (int[]) oin.readObject();
-			int[] historyCount = (int[]) oin.readObject();
-			int[] historyFlags = (int[]) oin.readObject();
-			for ( int i = historyFrom.length - 1; i >= 0; i-- ) {
-				mMoveHistory.push( new Move( historyFrom[i], historyToBegin[i], historyToEnd[i], historyCount[i], historyFlags[i] ) );
-			}
-
-			oin.close();
-
+			mElapsed     = loader.getElapsed();
+			mStartTime   = SystemClock.uptimeMillis() - mElapsed;
+			mRules       = loader.getRules();
+			mCardAnchor  = mRules.GetAnchorArray();
+			mMoveHistory = loader.getHistory();
 			mGameStarted = !mMoveHistory.isEmpty();
-			mRules = Rules.CreateRules( type, map, this, mMoveHistory, mAnimateCard );
-			Card.SetSize( type, calcScreenSize() );
+
+			Card.SetSize( mRules.GetType(), calcScreenSize() );
 			SetDisplayTime( prefs.displayTime() );
-			mCardAnchor = mRules.GetAnchorArray();
 			if ( mDrawMaster.GetWidth() > 1 ) {
 				mRules.Resize( mDrawMaster.GetWidth(), mDrawMaster.GetHeight() );
 				Refresh();
 			}
-			mTimePaused = false;
-			return true;
-
-		} catch ( FileNotFoundException e ) {
-			Log.e( "SolitaireView.java", "LoadSave(): File not found" );
-		} catch ( StreamCorruptedException e ) {
-			Log.e( "SolitaireView.java", "LoadSave(): Stream Corrupted" );
-		} catch ( IOException e ) {
-			Log.e( "SolitaireView.java", "LoadSave(): IOException" );
-		} catch ( ClassNotFoundException e ) {
-			Log.e( "SolitaireView.java", "LoadSave(): Class not found exception" );
 		}
+
 		mTimePaused = false;
 		mPaused = false;
 		return false;
@@ -608,9 +501,7 @@ public class SolitaireView extends View {
 		// Text mode only handles clickys
 		if ( mViewMode == MODE_TEXT ) {
 			if ( event.getAction() == MotionEvent.ACTION_UP && mTextViewDown ) {
-				SharedPreferences.Editor editor = mContext.getSharedPreferences( "SolitairePreferences", 0 ).edit();
-				editor.putBoolean( "PlayedBefore", true );
-				editor.commit();
+				new AppState( mContext ).hasPlayed( true );
 				mTextViewDown = false;
 				ChangeViewMode( MODE_NORMAL );
 			}
@@ -855,30 +746,25 @@ public class SolitaireView extends View {
 	}
 
 	private void MarkAttempt() {
-		String gameAttemptString = mRules.GetGameTypeString() + "Attempts";
-		int attempts = GetSettings().getInt( gameAttemptString, 0 );
-		SharedPreferences.Editor editor = GetSettings().edit();
-		editor.putInt( gameAttemptString, attempts + 1 );
-		editor.commit();
+		StatsManager stats = new StatsManager( mContext );
+		int currentAttempts = stats.getGameAttempts( mRules );
+		stats.setGameAttempts( mRules, currentAttempts + 1 );
 	}
 
 	private void MarkWin() {
-		String gameWinString = mRules.GetGameTypeString() + "Wins";
-		String gameTimeString = mRules.GetGameTypeString() + "Time";
-		int wins = GetSettings().getInt( gameWinString, 0 );
-		int bestTime = GetSettings().getInt( gameTimeString, -1 );
-		SharedPreferences.Editor editor = GetSettings().edit();
-
+		StatsManager stats = new StatsManager( mContext );
+		int bestTime = stats.getBestGameTime( mRules );
 		if ( bestTime == -1 || mElapsed < bestTime ) {
-			editor.putInt( gameTimeString, mElapsed );
+			stats.setBestGameTime( mRules, mElapsed );
 		}
 
-		editor.putInt( gameWinString, wins + 1 );
-		editor.commit();
+		int wins = stats.getGameWins( mRules );
+		stats.setGameWins( mRules, wins + 1 );
+
 		if ( mRules.HasScore() ) {
 			mWinningScore = mRules.GetScore();
-			if ( mWinningScore > GetSettings().getInt( mRules.GetGameTypeString() + "Score", -52 ) ) {
-				editor.putInt( mRules.GetGameTypeString() + "Score", mWinningScore );
+			if ( mWinningScore > stats.getGameHighScore( mRules ) ) {
+				stats.setBestGameScore( mRules, mWinningScore );
 			}
 		}
 	}

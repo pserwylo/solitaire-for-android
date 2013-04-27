@@ -18,7 +18,7 @@ package com.kmagic.solitaire;
 import android.graphics.*;
 
 
-class CardAnchor {
+public class CardAnchor {
 
 	public static final int MAX_CARDS = 104;
 	public static final int SEQ_SINK = 1;

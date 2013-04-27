@@ -23,6 +23,7 @@ import android.view.*;
 import android.widget.*;
 import com.kmagic.solitaire.activities.*;
 import com.kmagic.solitaire.compat.*;
+import com.kmagic.solitaire.io.*;
 
 // Base activity class.
 public class Solitaire extends Activity {
@@ -30,16 +31,10 @@ public class Solitaire extends Activity {
 	// View extracted from main.xml.
 	private View mMainView;
 	private SolitaireView mSolitaireView;
-	private SharedPreferences mSettings;
 
 	private MainMenuCompat mainMenu = MainMenuCompat.create( this );
 
 	private boolean mDoSave;
-
-	// Shared preferences are where the various user settings are stored.
-	public SharedPreferences GetSettings() {
-		return mSettings;
-	}
 
 	@Override
 	public void onCreate( Bundle savedInstanceState ) {
@@ -49,7 +44,6 @@ public class Solitaire extends Activity {
 		setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE );
 
 		// If the user has never accepted the EULA show it again.
-		mSettings = getSharedPreferences( "SolitairePreferences", 0 );
 		setContentView( R.layout.main );
 		mMainView = findViewById( R.id.main_view );
 		mSolitaireView = (SolitaireView) findViewById( R.id.solitaire );
@@ -76,10 +70,9 @@ public class Solitaire extends Activity {
 	@Override
 	public void onStart() {
 		super.onStart();
-		if ( mSettings.getBoolean( "SolitaireSaveValid", false ) ) {
-			SharedPreferences.Editor editor = GetSettings().edit();
-			editor.putBoolean( "SolitaireSaveValid", false );
-			editor.commit();
+		AppState state = new AppState( this );
+		if ( state.hasSave() ) {
+			state.hasSave( false );
 			// If save is corrupt, just start a new game.
 			if ( mSolitaireView.LoadSave() ) {
 				HelpSplashScreen();
@@ -87,14 +80,15 @@ public class Solitaire extends Activity {
 			}
 		}
 
-		mSolitaireView.InitGame( mSettings.getInt( "LastType", Rules.SOLITAIRE ) );
+		mSolitaireView.InitGame();
 		HelpSplashScreen();
 	}
 
 	// Force show the help if this is the first time played. Sadly no one reads
 	// it anyways.
 	private void HelpSplashScreen() {
-		if ( !mSettings.getBoolean( "PlayedBefore", false ) ) {
+		AppState state = new AppState( this );
+		if ( !state.hasPlayed() ) {
 			mSolitaireView.DisplayHelp();
 		}
 	}
@@ -143,7 +137,7 @@ public class Solitaire extends Activity {
 
 	public void NewOptions() {
 		setContentView( mMainView );
-		mSolitaireView.InitGame( mSettings.getInt( "LastType", Rules.SOLITAIRE ) );
+		mSolitaireView.InitGame();
 	}
 
 	// This is called for option changes that require a refresh, but not a new game

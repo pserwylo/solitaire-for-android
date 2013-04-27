@@ -1,23 +1,10 @@
 = Links to issues on original repo: ==
 
-Vegas dollar amounts inconsistently reset:
-https://code.google.com/p/solitaire-for-android/issues/detail?id=133
-
-Save game state between different game types:
-https://code.google.com/p/solitaire-for-android/issues/detail?id=127
-
-Re-draw cards after loading:
-https://code.google.com/p/solitaire-for-android/issues/detail?id=125
-
 Weird behaviour locking screen half way through spider deal:
 https://code.google.com/p/solitaire-for-android/issues/detail?id=122
 
 Inconsistent stack moves in 40 thieves:
 https://code.google.com/p/solitaire-for-android/issues/detail?id=113
-
-Move save&quit away from quit:
-https://code.google.com/p/solitaire-for-android/issues/detail?id=104
-Maybe just prompt to save on quit instead. Would free up more menu space too.
 
 Add "cleanup" option to klondike:
 https://code.google.com/p/solitaire-for-android/issues/detail?id=91

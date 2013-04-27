@@ -18,6 +18,7 @@ package com.kmagic.solitaire;
 import android.content.*;
 import android.view.*;
 import android.widget.*;
+import com.kmagic.solitaire.io.*;
 
 
 public class Stats {
@@ -29,17 +30,13 @@ public class Stats {
 		statsView.setFocusable( true );
 		statsView.setFocusableInTouchMode( true );
 
-		Rules rules = view.GetRules();
-		final SharedPreferences settings = solitaire.GetSettings();
-		final String gameAttemptString = rules.GetGameTypeString() + "Attempts";
-		final String gameWinString = rules.GetGameTypeString() + "Wins";
-		final String gameTimeString = rules.GetGameTypeString() + "Time";
-		final String gameScoreString = rules.GetGameTypeString() + "Score";
-		int attempts = settings.getInt( gameAttemptString, 0 );
-		int wins = settings.getInt( gameWinString, 0 );
-		int bestTime = settings.getInt( gameTimeString, -1 );
-		int highScore = settings.getInt( gameScoreString, -52 );
-		float ratio = 0;
+		final Rules rules = view.GetRules();
+		final StatsManager stats = new StatsManager( solitaire );
+		int attempts  = stats.getGameAttempts( rules );
+		int wins      = stats.getGameWins( rules );
+		int bestTime  = stats.getBestGameTime( rules );
+		int highScore = stats.getGameHighScore( rules );
+		float ratio   = 0;
 		if ( attempts > 0 ) {
 			ratio = (float) wins / (float) attempts * 100.0f;
 		}
@@ -71,11 +68,9 @@ public class Stats {
 		final Button clear = (Button) solitaire.findViewById( R.id.button_clear );
 		clear.setOnClickListener( new View.OnClickListener() {
 			public void onClick( View v ) {
-				SharedPreferences.Editor editor = settings.edit();
-				editor.putInt( gameAttemptString, 0 );
-				editor.putInt( gameWinString, 0 );
-				editor.putInt( gameTimeString, -1 );
-				editor.commit();
+				stats.setGameAttempts( rules, 0 );
+				stats.setGameWins( rules, 0 );
+				stats.setBestGameTime( rules, -1 );
 				view.ClearGameStarted();
 				solitaire.CancelOptions();
 			}
